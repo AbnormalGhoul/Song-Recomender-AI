@@ -2,9 +2,9 @@
 
 ## Info
 **Team:**
-- Itay Shemesh,
-- Felix Roman,
-- Connor Chase,
+- Itay Shemesh, DBSCAN 
+- Felix Roman, KNN
+- Connor Chase, GMM
 - Jaden Bryant,
 
 ## Dataset
