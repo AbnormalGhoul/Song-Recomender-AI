@@ -28,3 +28,13 @@ SONG_FEATURES = [
 
 # MongoDB indexes used to avoid duplicate songs and speed up lookups.
 UNIQUE_SONG_FIELD = "track_id"
+
+# Spark / distributed-processing settings.
+PARQUET_DIR = Path(os.getenv("PARQUET_DIR", str(DATA_DIR / "parquet" / "songs")))
+RESULTS_DIR = PROJECT_ROOT / "results"
+SPARK_MASTER = os.getenv("SPARK_MASTER")  # e.g. "local[*]" or "spark://host:7077"
+SPARK_SHUFFLE_PARTITIONS = int(os.getenv("SPARK_SHUFFLE_PARTITIONS", "64"))
+MONGO_SPARK_PACKAGE = os.getenv(
+    "MONGO_SPARK_PACKAGE",
+    "org.mongodb.spark:mongo-spark-connector_2.12:10.4.0",
+)

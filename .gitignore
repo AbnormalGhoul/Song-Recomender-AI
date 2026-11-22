@@ -222,5 +222,12 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+# Generated Spark outputs
+data/parquet/
+models/
+results/*.parquet/
+spark-warehouse/
+metastore_db/
+
 # macOS
 .DS_Store
