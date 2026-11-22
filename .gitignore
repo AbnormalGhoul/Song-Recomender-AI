@@ -228,3 +228,6 @@ models/
 results/*.parquet/
 spark-warehouse/
 metastore_db/
+
+# macOS
+.DS_Store

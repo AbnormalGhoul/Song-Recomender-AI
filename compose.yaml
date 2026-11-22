@@ -1,0 +1,24 @@
+services:
+  mongo:
+    image: mongo:8.0
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ping: 1}).ok ? quit(0) : quit(1)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    profiles: [jobs]
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/
+    depends_on:
+      mongo:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data:ro
+
+volumes:
+  mongo-data:

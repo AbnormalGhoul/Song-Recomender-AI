@@ -14,7 +14,7 @@ A Python song recommender using MongoDB and the Million Song Dataset (MSD). It r
 - **Full:** http://millionsongdataset.com/
 
 ## Prerequisites
-- **Python 3.10+**
+- **Python 3.12**
 - **MongoDB** (running locally on port 27017, or accessible via network)
 
 ## Setup & Installation
@@ -33,7 +33,7 @@ A Python song recommender using MongoDB and the Million Song Dataset (MSD). It r
 
 3. **Install the required dependencies:**
    ```bash
-   pip install -r requirements.txt
+   python -m pip install -r requirements.txt
    ```
 
 4. **Start MongoDB:**
@@ -44,6 +44,23 @@ A Python song recommender using MongoDB and the Million Song Dataset (MSD). It r
 
 5. **Download the Dataset:**
    Place your downloaded Kaggle dataset (`.h5` files, folders, or `.tar.gz` archives) inside the `data/` folder.
+
+## Run with Docker Compose
+
+Start MongoDB and build the app:
+
+```bash
+docker compose up -d mongo
+docker compose build app
+```
+
+Place the Million Song Dataset HDF5 files in `data/`. For a tar archive, you may also put the whole archive file there. (e.g., `data/msd.tar.gz`.)
+
+```bash
+docker compose run --rm app python -m src.data_handling.ingest --path data/
+docker compose run --rm app python -m src.database.validate_db
+docker compose run --rm app python -m src.main --title "Song Title" --artist "Artist Name"
+```
 
 ## Configuration
 The application is configured using environment variables, with defaults managed in `src/config.py`:
