@@ -54,6 +54,11 @@ docker compose up -d mongo
 docker compose build app
 ```
 
+Compose publishes MongoDB on `localhost:27018` by default, avoiding a conflict
+with a MongoDB service already using port `27017`. Set `MONGODB_HOST_PORT` to
+change the host port if needed. The app container connects to MongoDB over the
+Compose network on port `27017`.
+
 Place the Million Song Dataset HDF5 files in `data/`. For a tar archive, you may also put the whole archive file there. (e.g., `data/msd.tar.gz`.)
 
 ```bash
