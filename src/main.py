@@ -6,6 +6,7 @@ import time
 
 from src.database.database import SongDatabase
 from src.recommenders.dbscan import DBSCANRecommender
+from src.spark.session import get_spark
 
 
 def main() -> int:
@@ -35,10 +36,12 @@ def main() -> int:
                 return 1
             track_id = song.get("track_id") or song.get("song_id")
 
+        spark = get_spark("SongRecommender-DBSCAN")
         recommender = DBSCANRecommender(
             eps=args.eps,
             min_samples=args.min_samples,
             recommendation_count=args.recommendations,
+            spark=spark,
         )
         started_at = time.perf_counter()
         recommender.fit_from_mongodb()

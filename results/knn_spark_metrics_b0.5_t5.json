@@ -1,0 +1,27 @@
+{
+  "songs_indexed": 10000,
+  "features": [
+    "duration",
+    "tempo",
+    "loudness",
+    "key",
+    "mode",
+    "time_signature"
+  ],
+  "spark_master": "local[*]",
+  "default_parallelism": 24,
+  "parquet_partitions": 8,
+  "bucket_length": 0.5,
+  "num_hash_tables": 5,
+  "k": 10,
+  "queries": 20,
+  "parquet_load_s": 2.125,
+  "fit_s": 5.061,
+  "lsh_query_mean_s": 0.299,
+  "lsh_query_median_s": 0.273,
+  "lsh_query_p95_s": 0.412,
+  "exact_query_mean_s": 0.217,
+  "recall_at_k_mean": 1.0,
+  "recall_at_k_min": 1.0,
+  "mean_cosine_similarity_of_recs": 0.9808
+}

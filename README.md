@@ -14,7 +14,7 @@ A Python song recommender using MongoDB and the Million Song Dataset (MSD). It r
 - **Full:** http://millionsongdataset.com/
 
 ## Prerequisites
-- **Python 3.10+**
+- **Python 3.12**
 - **MongoDB** (running locally on port 27017, or accessible via network)
 
 ## Setup & Installation
@@ -27,13 +27,13 @@ A Python song recommender using MongoDB and the Million Song Dataset (MSD). It r
 
 2. **Set up a Python virtual environment:**
    ```bash
-   python -m venv venv
+   python3.12 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install the required dependencies:**
    ```bash
-   pip install -r requirements.txt
+   python3.12 -m pip install -r requirements.txt
    ```
 
 4. **Start MongoDB:**
@@ -44,6 +44,23 @@ A Python song recommender using MongoDB and the Million Song Dataset (MSD). It r
 
 5. **Download the Dataset:**
    Place your downloaded Kaggle dataset (`.h5` files, folders, or `.tar.gz` archives) inside the `data/` folder.
+
+## Run with Docker Compose
+
+Start MongoDB and build the app:
+
+```bash
+docker compose up -d mongo
+docker compose build app
+```
+
+Place the Million Song Dataset HDF5 files in `data/`. For a tar archive, you may also put the whole archive file there. (e.g., `data/msd.tar.gz`.)
+
+```bash
+docker compose run --rm app python -m src.data_handling.ingest --path data/
+docker compose run --rm app python -m src.database.validate_db
+docker compose run --rm app python -m src.main --title "Song Title" --artist "Artist Name"
+```
 
 ## Configuration
 The application is configured using environment variables, with defaults managed in `src/config.py`:
@@ -66,10 +83,12 @@ python -m src.database.validate_db
 ```
 
 ### 3. Running the Recommender
-Once the database is populated, retrieve 10 recommendations from all four methods using the `main.py` entrypoint. Provide a song title and artist:
+The DBSCAN CLI reads the songs collection from MongoDB through the Spark connector and returns up to 10 recommendations for the given song title and artist. Parquet export is not required for DBSCAN:
 ```bash
 python -m src.main --title "Song Title" --artist "Artist Name"
 ```
+
+Tune DBSCAN with `--eps`, `--min-samples`, and `--recommendations` as needed.
 
 *(Alternatively, you can run `./start.sh` to see a quick overview of the available project commands).*
 
@@ -78,7 +97,7 @@ We implement four different machine learning approaches to compare recommendatio
 - **KNN (K-Nearest Neighbors):** Finds the closest songs in the feature space using cosine similarity.
 - **DBSCAN:** Identifies density-connected clusters of songs.
 - **GMM (Gaussian Mixture Model):** Assigns songs to probabilistic Gaussian components.
-- **Hierarchical Clustering:** Builds a nested tree of song clusters using agglomerative merging.
+- **Hierarchical Clustering:** Uses bisecting k-means to split songs into clusters, then ranks tracks in the seed's cluster by Euclidean distance on standardized features.
 
 ## Data Preparation & Schema
 - **Reduction:** Selects identity fields, year/release, and a compact set of useful numeric analysis features from the HDF5 dataset.

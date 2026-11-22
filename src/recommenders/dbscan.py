@@ -17,9 +17,6 @@ from src.config import (
     SONG_FEATURES,
 )
 
-MONGODB_SPARK_CONNECTOR = "org.mongodb.spark:mongo-spark-connector_2.12:10.4.1"
-
-
 class DBSCANRecommender:
     """Distributed DBSCAN with an epsilon grid index and Spark RDD operations.
 
@@ -58,11 +55,9 @@ class DBSCANRecommender:
 
     def _get_spark(self) -> SparkSession:
         if self.spark is None:
-            self.spark = (
-                SparkSession.builder.appName("SongRecommenderDBSCAN")
-                .config("spark.jars.packages", MONGODB_SPARK_CONNECTOR)
-                .getOrCreate()
-            )
+            from src.spark.session import get_spark
+
+            self.spark = get_spark("SongRecommender-DBSCAN")
         return self.spark
 
     def fit_from_mongodb(
