@@ -14,7 +14,7 @@ A Python song recommender using MongoDB and the Million Song Dataset (MSD). It r
 - **Full:** http://millionsongdataset.com/
 
 ## Prerequisites
-- **Python 3.10+**
+- **Python 3.12**
 - **MongoDB** (running locally on port 27017, or accessible via network)
 
 ## Setup & Installation
@@ -33,7 +33,7 @@ A Python song recommender using MongoDB and the Million Song Dataset (MSD). It r
 
 3. **Install the required dependencies:**
    ```bash
-   pip install -r requirements.txt
+   python -m pip install -r requirements.txt
    ```
 
 4. **Start MongoDB:**
