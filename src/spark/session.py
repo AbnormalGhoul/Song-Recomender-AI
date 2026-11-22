@@ -12,20 +12,23 @@ from src.config import (
 )
 
 
-def get_spark(app_name: str = "SongRecommender") -> SparkSession:
-    """Return a SparkSession with the MongoDB Spark Connector configured.
+def get_spark(app_name: str = "SongRecommender", *, with_mongo: bool = True) -> SparkSession:
+    """Return a SparkSession, optionally with the MongoDB Spark Connector configured.
 
     Runs in local mode unless SPARK_MASTER points at a cluster.
-    The connector JAR is downloaded from Maven on first use.
     """
     builder = (
         SparkSession.builder.appName(app_name)
-        .config("spark.jars.packages", MONGO_SPARK_PACKAGE)
-        .config("spark.mongodb.read.connection.uri", MONGODB_URI)
-        .config("spark.mongodb.write.connection.uri", MONGODB_URI)
         .config("spark.sql.shuffle.partitions", SPARK_SHUFFLE_PARTITIONS)
         .config("spark.sql.parquet.compression.codec", "snappy")
     )
+
+    if with_mongo:
+        builder = (
+            builder.config("spark.jars.packages", MONGO_SPARK_PACKAGE)
+            .config("spark.mongodb.read.connection.uri", MONGODB_URI)
+            .config("spark.mongodb.write.connection.uri", MONGODB_URI)
+        )
 
     if SPARK_MASTER:
         builder = builder.master(SPARK_MASTER)

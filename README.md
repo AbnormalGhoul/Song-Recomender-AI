@@ -27,13 +27,13 @@ A Python song recommender using MongoDB and the Million Song Dataset (MSD). It r
 
 2. **Set up a Python virtual environment:**
    ```bash
-   python -m venv venv
+   python3.12 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install the required dependencies:**
    ```bash
-   python -m pip install -r requirements.txt
+   python3.12 -m pip install -r requirements.txt
    ```
 
 4. **Start MongoDB:**
@@ -59,6 +59,7 @@ Place the Million Song Dataset HDF5 files in `data/`. For a tar archive, you may
 ```bash
 docker compose run --rm app python -m src.data_handling.ingest --path data/
 docker compose run --rm app python -m src.database.validate_db
+docker compose run --rm app python -m src.spark.export_parquet
 docker compose run --rm app python -m src.main --title "Song Title" --artist "Artist Name"
 ```
 
@@ -83,8 +84,9 @@ python -m src.database.validate_db
 ```
 
 ### 3. Running the Recommender
-Once the database is populated, retrieve 10 recommendations from all four methods using the `main.py` entrypoint. Provide a song title and artist:
+Once the database is populated, export the songs to Parquet for recommenders. The export needs to be rerun after updating the song catalog. The CLI returns up to 10 recommendations per method for the given song title and artist:
 ```bash
+python -m src.spark.export_parquet
 python -m src.main --title "Song Title" --artist "Artist Name"
 ```
 
@@ -95,7 +97,7 @@ We implement four different machine learning approaches to compare recommendatio
 - **KNN (K-Nearest Neighbors):** Finds the closest songs in the feature space using cosine similarity.
 - **DBSCAN:** Identifies density-connected clusters of songs.
 - **GMM (Gaussian Mixture Model):** Assigns songs to probabilistic Gaussian components.
-- **Hierarchical Clustering:** Builds a nested tree of song clusters using agglomerative merging.
+- **Hierarchical Clustering:** Uses bisecting k-means to split songs into clusters, then ranks tracks in the seed's cluster by Euclidean distance on standardized features.
 
 ## Data Preparation & Schema
 - **Reduction:** Selects identity fields, year/release, and a compact set of useful numeric analysis features from the HDF5 dataset.
