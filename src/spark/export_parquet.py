@@ -91,9 +91,11 @@ def export(out: Path, partitions: int) -> dict:
     print("Parquet schema:")
     written.printSchema()
     print("Sample rows:")
-    written.select("song_id", "title", "artist", "tempo", "loudness", "year").show(
-        5, truncate=40
-    )
+    sample_columns = [
+        c for c in ("song_id", "title", "artist", "tempo", "loudness", "year")
+        if c in written.columns
+    ]
+    written.select(*sample_columns).show(5, truncate=40)
     print(
         f"Wrote {stats['rows']:,} songs to {out} "
         f"({stats['files']} files, {stats['bytes'] / 1e6:.1f} MB) "
