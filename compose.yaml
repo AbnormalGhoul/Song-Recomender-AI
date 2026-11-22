@@ -16,11 +16,13 @@ services:
     profiles: [jobs]
     environment:
       MONGODB_URI: mongodb://mongo:27017/
+      PARQUET_DIR: /app/parquet/songs
     depends_on:
       mongo:
         condition: service_healthy
     volumes:
       - ./data:/app/data:ro
+      - ./data/parquet:/app/parquet
 
 volumes:
   mongo-data:
