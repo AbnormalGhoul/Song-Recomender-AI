@@ -95,6 +95,15 @@ python -m src.main --title "Song Title" --artist "Artist Name"
 
 Tune DBSCAN with `--eps`, `--min-samples`, and `--recommendations` as needed.
 
+To capture fit time, repeated query latency, and Recall@10 against an exact
+full-catalog scan, run the DBSCAN benchmark. It fits once, warms the query path,
+then measures 20 deterministic seed songs by default. The JSON report is saved
+to `results/dbscan_benchmark.json`:
+
+```bash
+docker compose run --rm app python -m src.spark.dbscan_benchmark --queries 20
+```
+
 *(Alternatively, you can run `./start.sh` to see a quick overview of the available project commands).*
 
 ## Recommender Models

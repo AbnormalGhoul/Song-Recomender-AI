@@ -1,0 +1,238 @@
+{
+  "run_timestamp_utc": "2026-11-22T23:53:06.044811+00:00",
+  "algorithm": "Spark RDD DBSCAN",
+  "dataset": {
+    "source": "MongoDB via MongoDB Spark Connector",
+    "songs": 10000,
+    "features": [
+      "duration",
+      "tempo",
+      "loudness",
+      "key",
+      "mode",
+      "time_signature"
+    ]
+  },
+  "parameters": {
+    "eps": 0.5,
+    "min_samples": 5,
+    "recommendations": 10,
+    "queries": 20,
+    "sample_seed": 42
+  },
+  "runtime": {
+    "python": "3.12.16",
+    "pyspark": "3.5.10",
+    "spark": "3.5.10",
+    "java": "17.0.21.1",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.36",
+    "cpu_count": 16,
+    "spark_master": "local[*]",
+    "spark_default_parallelism": 16,
+    "spark_shuffle_partitions": 64,
+    "cpu_quota_cores": null,
+    "memory_limit_bytes": null
+  },
+  "fit_seconds": 250.3682422220004,
+  "cluster_count": 59,
+  "noise_songs": 3079,
+  "dbscan_query_latency_seconds": {
+    "mean": 0.9186853304499891,
+    "median": 0.8693332704999648,
+    "p95": 1.3736739049995776
+  },
+  "exact_full_scan_query_latency_seconds": {
+    "mean": 0.8526954755999668,
+    "median": 0.8244352449999042,
+    "p95": 1.1139237359998333
+  },
+  "mean_recall_at_n_against_exact": 0.8699999999999999,
+  "min_recall_at_n_against_exact": 0.0,
+  "mean_cluster_candidates_per_query": 1779.3,
+  "mean_exact_candidates_per_query": 9999,
+  "warmup_queries_excluded": 1,
+  "queries": [
+    {
+      "seed_id": "SORAACY12A8AE475D2",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 1.1291133879999506,
+      "exact_query_seconds": 1.0871032099998956,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOCHRGA12AB017D5CE",
+      "cluster": 2,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 1.1303322970002228,
+      "exact_query_seconds": 0.9448727009998947,
+      "recall_at_n": 0.9
+    },
+    {
+      "seed_id": "SORTCHS12AB017E07C",
+      "cluster": 3,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.7063243869997677,
+      "exact_query_seconds": 0.9166327469997668,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOFYJDL12A58A7DD52",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.9657328270000107,
+      "exact_query_seconds": 1.152403083000081,
+      "recall_at_n": 0.7
+    },
+    {
+      "seed_id": "SOLSJLW12A67020AB0",
+      "cluster": 3,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.8227715050002189,
+      "exact_query_seconds": 0.6674919000001864,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOLXDDC12A6701FBFD",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.9158950359997107,
+      "exact_query_seconds": 0.8212965669999903,
+      "recall_at_n": 0.9
+    },
+    {
+      "seed_id": "SORYNFW12A5891EC23",
+      "cluster": -1,
+      "recommendations_returned": 0,
+      "dbscan_query_seconds": 0.6684416289999717,
+      "exact_query_seconds": 1.0375165539999216,
+      "recall_at_n": 0.0
+    },
+    {
+      "seed_id": "SOCISCT12AB0180021",
+      "cluster": 2,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 1.8382467149999684,
+      "exact_query_seconds": 0.5540607650000311,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOUDSGM12AC9618304",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.7522606249999626,
+      "exact_query_seconds": 0.8217069779998383,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SONPVKR12A58A7BA4A",
+      "cluster": 3,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 1.115812673000164,
+      "exact_query_seconds": 1.1139237359998333,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOGHPTG12A6D4F97CF",
+      "cluster": 20,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 1.0433873279998807,
+      "exact_query_seconds": 0.8781957060000423,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOZAPRE12AB0182FFA",
+      "cluster": 2,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 1.3736739049995776,
+      "exact_query_seconds": 1.0350532709999243,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOWCTVQ12A8C134C64",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.9637394569999742,
+      "exact_query_seconds": 0.7045753089996651,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOONSSK12A6D4F94E0",
+      "cluster": 3,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 1.1013256420001198,
+      "exact_query_seconds": 0.8271635119999701,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOXKMLO12AB017FFDB",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.7389976040003603,
+      "exact_query_seconds": 0.6984940360002838,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOLFNJP12A58A78574",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.7112112559998423,
+      "exact_query_seconds": 0.7589141149996976,
+      "recall_at_n": 0.9
+    },
+    {
+      "seed_id": "SOTWSZN12AB0187523",
+      "cluster": 3,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.7760162929998842,
+      "exact_query_seconds": 0.8479011280001032,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOUAGDY12A6D4F63CF",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.641112701000111,
+      "exact_query_seconds": 0.7529302840002856,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOYRUNW12AB01856B8",
+      "cluster": -1,
+      "recommendations_returned": 0,
+      "dbscan_query_seconds": 0.25451112600012493,
+      "exact_query_seconds": 0.6388100270000905,
+      "recall_at_n": 0.0
+    },
+    {
+      "seed_id": "SOQZLAF12A8AE48030",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.7248002149999593,
+      "exact_query_seconds": 0.7948638829998345,
+      "recall_at_n": 1.0
+    }
+  ],
+  "non_noise_queries": 18,
+  "mean_recall_at_n_non_noise": 0.9666666666666666,
+  "min_recall_at_n_non_noise": 0.7,
+  "noise_queries": 2,
+  "mean_candidate_reduction_fraction": 0.822052205220522,
+  "non_noise_dbscan_query_latency_seconds": {
+    "mean": 0.9694863252222048,
+    "median": 0.9398172464998424,
+    "p95": 1.8382467149999684
+  },
+  "non_noise_exact_query_latency_seconds": {
+    "mean": 0.8543101628332957,
+    "median": 0.8244352449999042,
+    "p95": 1.152403083000081
+  },
+  "measurement_notes": {
+    "fit_seconds": "MongoDB read, preprocessing, clustering, and result caching.",
+    "query_latency": "Warm-cache seed lookup through recommendation collection.",
+    "exact_latency": "Warm-cache seed lookup, full-catalog distance sort, and collection.",
+    "recall_at_n": "Overlap with exact full-catalog top-N divided by the exact result count.",
+    "noise_queries": "Noise seeds return no DBSCAN recommendations and score zero recall."
+  }
+}

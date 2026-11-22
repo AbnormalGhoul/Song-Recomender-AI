@@ -23,6 +23,7 @@ services:
     volumes:
       - ./data:/app/data:ro
       - ./data/parquet:/app/parquet
+      - ./results:/app/results
 
 volumes:
   mongo-data:
