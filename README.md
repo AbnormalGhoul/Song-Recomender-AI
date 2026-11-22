@@ -27,13 +27,13 @@ A Python song recommender using MongoDB and the Million Song Dataset (MSD). It r
 
 2. **Set up a Python virtual environment:**
    ```bash
-   python -m venv venv
+   python3.12 -m venv venv
    source venv/bin/activate  # On Windows: venv\Scripts\activate
    ```
 
 3. **Install the required dependencies:**
    ```bash
-   python -m pip install -r requirements.txt
+   python3.12 -m pip install -r requirements.txt
    ```
 
 4. **Start MongoDB:**
