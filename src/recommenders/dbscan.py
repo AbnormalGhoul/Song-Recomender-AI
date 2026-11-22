@@ -6,7 +6,15 @@ import pandas as pd
 from pyspark import RDD, StorageLevel
 from pyspark.sql import DataFrame, Row, SparkSession
 from pyspark.sql.functions import abs as spark_abs
-from pyspark.sql.functions import col, isnan, lit, percentile_approx, when
+from pyspark.sql.functions import (
+    col,
+    isnan,
+    lit,
+    mean as spark_mean,
+    percentile_approx,
+    stddev_pop,
+    when,
+)
 from pyspark.sql.types import IntegerType, StructField
 
 from src.config import (
@@ -146,8 +154,8 @@ class DBSCANRecommender:
         aggregates = []
         for name in numeric_names:
             aggregates.extend([
-                col(name).mean().alias(f"__mean_{name}"),
-                col(name).stddev_pop().alias(f"__std_{name}"),
+                spark_mean(col(name)).alias(f"__mean_{name}"),
+                stddev_pop(col(name)).alias(f"__std_{name}"),
             ])
         stats = imputed.agg(*aggregates).first()
         self._scaled_columns = [f"__scaled_{name}" for name in valid_features]
@@ -176,6 +184,8 @@ class DBSCANRecommender:
         eps = self.eps
         minimum_samples = self.min_samples
         scaled_columns = self._scaled_columns
+        label_partitions = max(1, self._get_spark().sparkContext.defaultParallelism)
+
         def to_point(pair: tuple[Row, int]) -> tuple[int, tuple[tuple[float, ...], dict]]:
             row, point_id = pair
             record = row.asDict(recursive=True)
@@ -229,7 +239,7 @@ class DBSCANRecommender:
         )
         core_ids = (
             neighbors.map(lambda pair: (pair[0], 1))
-            .reduceByKey(lambda left, right: left + right)
+            .reduceByKey(lambda left, right: left + right, label_partitions)
             .filter(lambda item: item[1] >= minimum_samples)
             .keys()
             .persist(StorageLevel.MEMORY_AND_DISK)
@@ -237,35 +247,39 @@ class DBSCANRecommender:
 
         # A connected component of core points is one DBSCAN cluster. Iterative
         # minimum-label propagation uses Spark joins/reductions across workers.
-        core_markers = core_ids.map(lambda point_id: (point_id, True)).persist(
-            StorageLevel.MEMORY_AND_DISK
+        core_markers = (
+            core_ids.map(lambda point_id: (point_id, True))
+            .partitionBy(label_partitions)
+            .persist(StorageLevel.MEMORY_AND_DISK)
         )
         core_edges = (
             neighbors
             .map(lambda pair: (pair[1], pair[0]))
-            .join(core_markers)
+            .join(core_markers, numPartitions=label_partitions)
             .map(lambda item: (item[1][0], item[0]))
-            .join(core_markers)
+            .join(core_markers, numPartitions=label_partitions)
             .map(lambda item: (item[0], item[1][0]))
-            .distinct()
+            .distinct(numPartitions=label_partitions)
             .persist(StorageLevel.MEMORY_AND_DISK)
         )
 
-        labels = core_ids.map(lambda point_id: (point_id, point_id)).persist(
-            StorageLevel.MEMORY_AND_DISK
+        labels = (
+            core_ids.map(lambda point_id: (point_id, point_id))
+            .partitionBy(label_partitions)
+            .persist(StorageLevel.MEMORY_AND_DISK)
         )
         converged = False
         for _ in range(self.max_label_iterations):
             propagated = (
                 core_edges
                 .map(lambda edge: (edge[1], edge[0]))
-                .join(labels)
+                .join(labels, numPartitions=label_partitions)
                 .map(lambda item: (item[1][0], item[1][1]))
                 .union(labels)
-                .reduceByKey(min)
+                .reduceByKey(min, label_partitions)
                 .persist(StorageLevel.MEMORY_AND_DISK)
             )
-            changed = labels.join(propagated).filter(
+            changed = labels.join(propagated, numPartitions=label_partitions).filter(
                 lambda item: item[1][0] != item[1][1]
             ).take(1)
             labels.unpersist()
@@ -284,28 +298,38 @@ class DBSCANRecommender:
         border_labels = (
             neighbors
             .map(lambda pair: (pair[1], pair[0]))
-            .join(labels)
+            .join(labels, numPartitions=label_partitions)
             .map(lambda item: (item[1][0], item[1][1]))
-            .reduceByKey(min)
-            .leftOuterJoin(core_markers)
+            .reduceByKey(min, label_partitions)
+            .leftOuterJoin(core_markers, numPartitions=label_partitions)
             .filter(lambda item: item[1][1] is None)
             .mapValues(lambda item: item[0])
         )
-        cluster_labels = labels.union(border_labels).persist(
-            StorageLevel.MEMORY_AND_DISK
+        cluster_labels = (
+            labels.union(border_labels)
+            .partitionBy(label_partitions)
+            .persist(StorageLevel.MEMORY_AND_DISK)
+        )
+        all_labels = (
+            points.mapValues(lambda _: -1)
+            .leftOuterJoin(cluster_labels, numPartitions=label_partitions)
+            .mapValues(
+                lambda result: result[0] if result[1] is None else result[1]
+            )
+            .persist(StorageLevel.MEMORY_AND_DISK)
         )
         schema = working.schema.add(
             StructField("cluster", IntegerType(), nullable=False)
         )
         clustered_rows = (
-            cluster_labels.join(points)
+            all_labels.join(points, numPartitions=label_partitions)
             .map(lambda item: Row(**item[1][1][1], cluster=int(item[1][0])))
         )
         self.songs = self._get_spark().createDataFrame(
             clustered_rows, schema=schema
         ).persist(StorageLevel.MEMORY_AND_DISK)
         self.songs.count()
-        self.labels = cluster_labels
+        self.labels = all_labels
 
         # Keep the expensive indexed data cached for recommendations. The
         # original point records are represented in ``self.songs`` instead.
@@ -315,6 +339,7 @@ class DBSCANRecommender:
         core_ids.unpersist()
         core_markers.unpersist()
         core_edges.unpersist()
+        cluster_labels.unpersist()
 
     def find_song(self, track_id: str) -> dict:
         """Find a song and its DBSCAN cluster assignment."""
