@@ -1,0 +1,238 @@
+{
+  "run_timestamp_utc": "2026-11-23T00:13:25.472563+00:00",
+  "algorithm": "Spark RDD DBSCAN",
+  "dataset": {
+    "source": "MongoDB via MongoDB Spark Connector",
+    "songs": 10000,
+    "features": [
+      "duration",
+      "tempo",
+      "loudness",
+      "key",
+      "mode",
+      "time_signature"
+    ]
+  },
+  "parameters": {
+    "eps": 0.5,
+    "min_samples": 5,
+    "recommendations": 10,
+    "queries": 20,
+    "sample_seed": 42
+  },
+  "runtime": {
+    "python": "3.12.16",
+    "pyspark": "3.5.10",
+    "spark": "3.5.10",
+    "java": "17.0.21.1",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.36",
+    "cpu_count": 16,
+    "spark_master": "local[*]",
+    "spark_default_parallelism": 16,
+    "spark_shuffle_partitions": 64,
+    "cpu_quota_cores": null,
+    "memory_limit_bytes": null
+  },
+  "fit_seconds": 216.24445463199936,
+  "cluster_count": 59,
+  "noise_songs": 3079,
+  "dbscan_query_latency_seconds": {
+    "mean": 0.9490119296999182,
+    "median": 0.7796696744994733,
+    "p95": 1.5365106740000556
+  },
+  "exact_full_scan_query_latency_seconds": {
+    "mean": 0.882840125300072,
+    "median": 0.8722764210001515,
+    "p95": 1.1593967019998672
+  },
+  "mean_recall_at_n_against_exact": 0.8699999999999999,
+  "min_recall_at_n_against_exact": 0.0,
+  "non_noise_queries": 18,
+  "mean_recall_at_n_non_noise": 0.9666666666666666,
+  "min_recall_at_n_non_noise": 0.7,
+  "noise_queries": 2,
+  "mean_cluster_candidates_per_query": 1779.3,
+  "mean_exact_candidates_per_query": 9999,
+  "mean_candidate_reduction_fraction": 0.822052205220522,
+  "non_noise_dbscan_query_latency_seconds": {
+    "mean": 0.9992420510555147,
+    "median": 0.7956455244998324,
+    "p95": 3.192498097999305
+  },
+  "non_noise_exact_query_latency_seconds": {
+    "mean": 0.8824753455000468,
+    "median": 0.8722764210001515,
+    "p95": 1.6355745920000118
+  },
+  "warmup_queries_excluded": 1,
+  "measurement_notes": {
+    "fit_seconds": "MongoDB read, preprocessing, clustering, and result caching.",
+    "query_latency": "Warm-cache seed lookup through recommendation collection.",
+    "exact_latency": "Warm-cache seed lookup, full-catalog distance sort, and collection.",
+    "recall_at_n": "Overlap with exact full-catalog top-N divided by the exact result count.",
+    "noise_queries": "Noise seeds return no DBSCAN recommendations and score zero recall."
+  },
+  "queries": [
+    {
+      "seed_id": "SORAACY12A8AE475D2",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 1.5365106740000556,
+      "exact_query_seconds": 0.8250662569998894,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOCHRGA12AB017D5CE",
+      "cluster": 2,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 3.192498097999305,
+      "exact_query_seconds": 0.9672131750003246,
+      "recall_at_n": 0.9
+    },
+    {
+      "seed_id": "SORTCHS12AB017E07C",
+      "cluster": 3,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 1.1098290410000118,
+      "exact_query_seconds": 1.6355745920000118,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOFYJDL12A58A7DD52",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 1.2706758949998402,
+      "exact_query_seconds": 1.1593967019998672,
+      "recall_at_n": 0.7
+    },
+    {
+      "seed_id": "SOLSJLW12A67020AB0",
+      "cluster": 3,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.777710816999388,
+      "exact_query_seconds": 0.9744790280001325,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOLXDDC12A6701FBFD",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.9779119690001608,
+      "exact_query_seconds": 0.9794178970005305,
+      "recall_at_n": 0.9
+    },
+    {
+      "seed_id": "SORYNFW12A5891EC23",
+      "cluster": -1,
+      "recommendations_returned": 0,
+      "dbscan_query_seconds": 0.6535236189993157,
+      "exact_query_seconds": 0.9769431510003415,
+      "recall_at_n": 0.0
+    },
+    {
+      "seed_id": "SOCISCT12AB0180021",
+      "cluster": 2,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.7816285319995586,
+      "exact_query_seconds": 0.8370093300000008,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOUDSGM12AC9618304",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.7656739789999847,
+      "exact_query_seconds": 0.7249397739997221,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SONPVKR12A58A7BA4A",
+      "cluster": 3,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.8096625170001062,
+      "exact_query_seconds": 0.5767438330003642,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOGHPTG12A6D4F97CF",
+      "cluster": 20,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.7427891819997967,
+      "exact_query_seconds": 0.9532316419999916,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOZAPRE12AB0182FFA",
+      "cluster": 2,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.7054119060003359,
+      "exact_query_seconds": 0.5962299820002954,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOWCTVQ12A8C134C64",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.6934429479997561,
+      "exact_query_seconds": 0.7311951419997058,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOONSSK12A6D4F94E0",
+      "cluster": 3,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.9429113900005177,
+      "exact_query_seconds": 0.9075435120003021,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOXKMLO12AB017FFDB",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.8289411320001818,
+      "exact_query_seconds": 0.9307689999996,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOLFNJP12A58A78574",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.680774645999918,
+      "exact_query_seconds": 0.5362473519999185,
+      "recall_at_n": 0.9
+    },
+    {
+      "seed_id": "SOTWSZN12AB0187523",
+      "cluster": 3,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.611616125999717,
+      "exact_query_seconds": 0.6967519620002349,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOUAGDY12A6D4F63CF",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.65853281300042,
+      "exact_query_seconds": 0.824669626999821,
+      "recall_at_n": 1.0
+    },
+    {
+      "seed_id": "SOYRUNW12AB01856B8",
+      "cluster": -1,
+      "recommendations_returned": 0,
+      "dbscan_query_seconds": 0.3403580559997863,
+      "exact_query_seconds": 0.7953031360002569,
+      "recall_at_n": 0.0
+    },
+    {
+      "seed_id": "SOQZLAF12A8AE48030",
+      "cluster": 0,
+      "recommendations_returned": 10,
+      "dbscan_query_seconds": 0.8998352540002088,
+      "exact_query_seconds": 1.0280774120001297,
+      "recall_at_n": 1.0
+    }
+  ]
+}

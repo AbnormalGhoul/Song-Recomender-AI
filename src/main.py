@@ -1,88 +1,91 @@
+"""Command-line entry point for Spark DBSCAN recommendations."""
+
 import argparse
 import sys
-import pandas as pd
-from src.config import PARQUET_DIR
+import time
+
 from src.database.database import SongDatabase
-from src.recommenders.knn import KNNRecommender
 from src.recommenders.dbscan import DBSCANRecommender
-from src.recommenders.gmm import GMMRecommender
-from src.recommenders.hierarchical import HierarchicalRecommender
 from src.spark.session import get_spark
 
 
-def hierarchical_recommendations(song_id: str) -> pd.DataFrame:
-    if not PARQUET_DIR.is_dir():
-        raise FileNotFoundError(
-            f"No song Parquet dataset at {PARQUET_DIR}. "
-            "Run python -m src.spark.export_parquet first."
-        )
-
-    spark = get_spark("SongRecommender-Hierarchical", with_mongo=False)
-    try:
-        songs = spark.read.parquet(str(PARQUET_DIR))
-        recommender = HierarchicalRecommender()
-        recommender.fit(songs)
-        return recommender.recommend(track_id=song_id)
-    finally:
-        spark.stop()
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Song Recommender AI")
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Spark DBSCAN song recommender")
     parser.add_argument("--title", required=True, help="Song title")
     parser.add_argument("--artist", required=True, help="Song artist")
+    parser.add_argument("--eps", type=float, default=0.5, help="DBSCAN radius")
+    parser.add_argument(
+        "--min-samples", type=int, default=5,
+        help="Minimum songs in an epsilon neighborhood",
+    )
+    parser.add_argument(
+        "--recommendations", type=int, default=10,
+        help="Maximum recommendations to return",
+    )
     args = parser.parse_args()
 
     try:
         with SongDatabase() as db:
             song = db.find_by_title_artist(args.title, args.artist)
             if not song:
-                print(f"Error: Song '{args.title}' by '{args.artist}' not found in the database.")
-                sys.exit(1)
-            
+                print(
+                    f"Error: Song '{args.title}' by '{args.artist}' "
+                    "not found in the database.",
+                    file=sys.stderr,
+                )
+                return 1
             track_id = song.get("track_id") or song.get("song_id")
-            
-            print(f"Found song: {song.get('title', args.title)} by {song.get('artist', args.artist)} (ID: {track_id})")
-            print("Loading dataset features from database...")
-            records = db.get_song_features()
-            if not records:
-                print("Error: No songs found in the database. Please ingest data first.")
-                sys.exit(1)
-            
-            songs_df = pd.DataFrame.from_records(records)
-    except Exception as e:
-        print(f"Database error: {e}")
-        sys.exit(1)
-        
-    print(f"Loaded {len(songs_df)} songs. Training models...\n")
 
-    recommenders = {
-        "KNN": KNNRecommender(),
-        "DBSCAN": DBSCANRecommender(),
-        "GMM": GMMRecommender(n_components=min(10, len(songs_df))),
-    }
+        spark = get_spark("SongRecommender-DBSCAN")
+        recommender = DBSCANRecommender(
+            eps=args.eps,
+            min_samples=args.min_samples,
+            recommendation_count=args.recommendations,
+            spark=spark,
+        )
+        started_at = time.perf_counter()
+        recommender.fit_from_mongodb()
+        fit_seconds = time.perf_counter() - started_at
+        recommendations = recommender.recommend(track_id)
+        cluster_counts = {
+            int(row["cluster"]): int(row["count"])
+            for row in recommender.songs.groupBy("cluster").count().collect()
+        }
 
-    for name in [*recommenders, "Hierarchical"]:
-        print(f"--- {name} Recommendations ---")
+        print(
+            f"Found song: {song.get('title', args.title)} by "
+            f"{song.get('artist', args.artist)} (ID: {track_id})"
+        )
+        print(f"DBSCAN cluster: {recommender.get_cluster(track_id)}")
+        print(
+            f"Fit time: {fit_seconds:.2f}s; "
+            f"songs: {sum(cluster_counts.values())}; "
+            f"clusters: {sum(1 for cluster in cluster_counts if cluster != -1)}; "
+            f"noise: {cluster_counts.get(-1, 0)}"
+        )
+        if recommendations.empty:
+            print("No recommendations found (the song may be noise).")
+        else:
+            print("--- DBSCAN Recommendations ---")
+            for index, row in recommendations.iterrows():
+                print(
+                    f"{index + 1}. {row.get('title', 'Unknown')} by "
+                    f"{row.get('artist', row.get('artist_name', 'Unknown'))}"
+                )
+        return 0
+    except Exception as error:
+        print(f"Failed to generate DBSCAN recommendations: {error}", file=sys.stderr)
+        return 1
+    finally:
         try:
-            if name == "Hierarchical":
-                recs = hierarchical_recommendations(song.get("song_id") or track_id)
-            else:
-                recommender = recommenders[name]
-                recommender.fit(songs_df)
-                recs = recommender.recommend(track_id=track_id)
+            from pyspark.sql import SparkSession
 
-            if recs.empty:
-                print("No recommendations found.")
-            else:
-                for i, (_, row) in enumerate(recs.iterrows(), 1):
-                    title = row.get("title", "Unknown")
-                    artist = row.get("artist", "Unknown")
-                    print(f"{i}. {title} by {artist}")
-        except Exception as e:
-            print(f"Failed to generate recommendations: {e}")
-        print()
+            active_spark = SparkSession.getActiveSession()
+            if active_spark is not None:
+                active_spark.stop()
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

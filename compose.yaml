@@ -4,7 +4,7 @@ services:
     volumes:
       - mongo-data:/data/db
     ports:
-      - "127.0.0.1:27017:27017"
+      - "127.0.0.1:${MONGODB_HOST_PORT:-27018}:27017"
     healthcheck:
       test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ping: 1}).ok ? quit(0) : quit(1)"]
       interval: 5s
@@ -23,6 +23,7 @@ services:
     volumes:
       - ./data:/app/data:ro
       - ./data/parquet:/app/parquet
+      - ./results:/app/results
 
 volumes:
   mongo-data:
