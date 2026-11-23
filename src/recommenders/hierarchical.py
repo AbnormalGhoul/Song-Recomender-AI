@@ -61,7 +61,7 @@ class HierarchicalRecommender:
         scale_features = StandardScaler(
             inputCol="raw_features",
             outputCol="features",
-            withMean=True,
+            withMean=False,
             withStd=True,
         )
         stages = [fill_missing, make_vector, scale_features]
