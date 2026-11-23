@@ -54,12 +54,16 @@ docker compose up -d mongo
 docker compose build app
 ```
 
+Compose publishes MongoDB on `localhost:27018` by default, avoiding a conflict
+with a MongoDB service already using port `27017`. Set `MONGODB_HOST_PORT` to
+change the host port if needed. The app container connects to MongoDB over the
+Compose network on port `27017`.
+
 Place the Million Song Dataset HDF5 files in `data/`. For a tar archive, you may also put the whole archive file there. (e.g., `data/msd.tar.gz`.)
 
 ```bash
 docker compose run --rm app python -m src.data_handling.ingest --path data/
 docker compose run --rm app python -m src.database.validate_db
-docker compose run --rm app python -m src.spark.export_parquet
 docker compose run --rm app python -m src.main --title "Song Title" --artist "Artist Name"
 ```
 
@@ -84,10 +88,20 @@ python -m src.database.validate_db
 ```
 
 ### 3. Running the Recommender
-Once the database is populated, export the songs to Parquet for recommenders. The export needs to be rerun after updating the song catalog. The CLI returns up to 10 recommendations per method for the given song title and artist:
+The DBSCAN CLI reads the songs collection from MongoDB through the Spark connector and returns up to 10 recommendations for the given song title and artist. Parquet export is not required for DBSCAN:
 ```bash
-python -m src.spark.export_parquet
 python -m src.main --title "Song Title" --artist "Artist Name"
+```
+
+Tune DBSCAN with `--eps`, `--min-samples`, and `--recommendations` as needed.
+
+To capture fit time, repeated query latency, and Recall@10 against an exact
+full-catalog scan, run the DBSCAN benchmark. It fits once, warms the query path,
+then measures 20 deterministic seed songs by default. The JSON report is saved
+to `results/dbscan_benchmark.json`:
+
+```bash
+docker compose run --rm app python -m src.spark.dbscan_benchmark --queries 20
 ```
 
 *(Alternatively, you can run `./start.sh` to see a quick overview of the available project commands).*
